@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,13 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				flyzone: {
+					blue: '#1e40af',
+					'blue-light': '#3b82f6',
+					'blue-dark': '#1e3a8a',
+					'sky': '#0ea5e9',
+					'sky-light': '#38bdf8'
 				}
 			},
 			borderRadius: {
@@ -84,11 +92,36 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'fly-across': {
+					'0%': { transform: 'translateX(-100px) translateY(10px)' },
+					'50%': { transform: 'translateX(50vw) translateY(-10px)' },
+					'100%': { transform: 'translateX(calc(100vw + 100px)) translateY(10px)' }
+				},
+				'fade-in-up': {
+					'0%': { opacity: '0', transform: 'translateY(20px)' },
+					'100%': { opacity: '1', transform: 'translateY(0)' }
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0px)' },
+					'50%': { transform: 'translateY(-10px)' }
+				},
+				'pulse-blue': {
+					'0%, 100%': { boxShadow: '0 0 0 0 rgba(59, 130, 246, 0.7)' },
+					'50%': { boxShadow: '0 0 0 10px rgba(59, 130, 246, 0)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fly-across': 'fly-across 15s linear infinite',
+				'fade-in-up': 'fade-in-up 0.6s ease-out',
+				'float': 'float 3s ease-in-out infinite',
+				'pulse-blue': 'pulse-blue 2s infinite'
+			},
+			backgroundImage: {
+				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+				'sky-gradient': 'linear-gradient(135deg, #0ea5e9 0%, #1e40af 100%)'
 			}
 		}
 	},
