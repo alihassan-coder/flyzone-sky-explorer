@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plane, MapPin, Calendar, Clock, Seat } from 'lucide-react';
+import { Plane, MapPin, Calendar, Clock, Armchair } from 'lucide-react';
 import { User, Flight } from '../types/user';
 
 interface MyFlightsProps {
@@ -81,7 +80,7 @@ const MyFlights: React.FC<MyFlightsProps> = ({ user }) => {
             </div>
           </div>
           <div className="flex items-center space-x-2 text-gray-600">
-            <Seat size={16} />
+            <Armchair size={16} />
             <div>
               <div className="text-sm text-gray-500">Seat</div>
               <div className="font-medium">{flight.seat}</div>
