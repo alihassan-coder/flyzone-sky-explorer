@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plane, MessageCircle, Calendar, User as UserIcon, LogOut, Home } from 'lucide-react';
+import { Plane, MessageCircle, Calendar, User as UserIcon, LogOut, Home, Headset, Award, CalendarCheck, Bot } from 'lucide-react';
 import { User } from '../types/user';
 import ChatAgent from './ChatAgent';
-import BookFlight from './BookFlight';
+// import BookFlight from './BookFlight';
 import MyFlights from './MyFlights';
 
 interface DashboardProps {
@@ -13,7 +12,7 @@ interface DashboardProps {
   onLogout: () => void;
 }
 
-type ActiveTab = 'home' | 'chat' | 'book' | 'flights';
+type ActiveTab = 'home' | 'chat' | 'flights';
 
 const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('home');
@@ -22,8 +21,6 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
     switch (activeTab) {
       case 'chat':
         return <ChatAgent user={user} />;
-      case 'book':
-        return <BookFlight user={user} />;
       case 'flights':
         return <MyFlights user={user} />;
       default:
@@ -36,7 +33,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
               <p className="text-gray-600">Ready for your next adventure?</p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 gap-6">
               <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white transform hover:scale-105 transition-all duration-300 cursor-pointer"
                     onClick={() => setActiveTab('chat')}>
                 <CardHeader className="text-center">
@@ -44,17 +41,6 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
                   <CardTitle>Chat with Agent</CardTitle>
                   <CardDescription className="text-blue-100">
                     Get instant help with your travel needs
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-
-              <Card className="border-0 shadow-lg bg-gradient-to-br from-sky-500 to-sky-600 text-white transform hover:scale-105 transition-all duration-300 cursor-pointer"
-                    onClick={() => setActiveTab('book')}>
-                <CardHeader className="text-center">
-                  <Plane size={48} className="mx-auto mb-2" />
-                  <CardTitle>Book a Flight</CardTitle>
-                  <CardDescription className="text-sky-100">
-                    Find and book your perfect flight
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -71,31 +57,61 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
               </Card>
             </div>
 
-            <Card className="border-0 shadow-lg">
+            <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-100 to-white animate-fade-in-up">
               <CardHeader>
-                <CardTitle className="text-xl text-gray-800">Quick Stats</CardTitle>
+                <CardTitle className="text-2xl font-bold text-blue-900 flex items-center gap-2">
+                  Welcome to FlyZone
+                  <Plane className="text-sky-500" size={32} />
+                </CardTitle>
+                <CardDescription className="mt-2 text-blue-700 text-base">
+                  Your all-in-one platform for seamless travel planning, booking, and rewards. Enjoy a premium experience every time you fly.
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">3</div>
-                    <div className="text-sm text-gray-600">Flights Booked</div>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+                  {/* Personal Travel Agent */}
+                  <div className="p-6 rounded-xl bg-white shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col items-center border border-blue-100 hover:border-blue-300 animate-in fade-in zoom-in-50">
+                    <Bot className="text-sky-500 mb-2" size={40} />
+                    <h3 className="text-lg font-semibold text-blue-900 mb-1">Personal Travel Agent</h3>
+                    <p className="text-sm text-blue-700 mb-2">
+                      Get instant help, personalized recommendations, and booking support from our smart AI agent.
+                    </p>
+                    <span className="inline-block bg-sky-100 text-sky-700 text-xs px-2 py-1 rounded-full">AI Powered</span>
                   </div>
-                  <div className="bg-green-50 p-4 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">12</div>
-                    <div className="text-sm text-gray-600">Cities Visited</div>
+
+                  {/* Bookings & Tracking */}
+                  <div className="p-6 rounded-xl bg-white shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col items-center border border-blue-100 hover:border-blue-300 animate-in fade-in zoom-in-50 delay-100">
+                    <CalendarCheck className="text-blue-500 mb-2" size={40} />
+                    <h3 className="text-lg font-semibold text-blue-900 mb-1">Manage Your Trips</h3>
+                    <p className="text-sm text-blue-700 mb-2">
+                      Effortlessly view, track, and manage all your upcoming and past bookings in one place.
+                    </p>
+                    <span className="inline-block bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full">All-in-One Dashboard</span>
                   </div>
-                  <div className="bg-purple-50 p-4 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-600">2</div>
-                    <div className="text-sm text-gray-600">Upcoming Trips</div>
+
+                  {/* Rewards Program */}
+                  <div className="p-6 rounded-xl bg-white shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col items-center border border-blue-100 hover:border-blue-300 animate-in fade-in zoom-in-50 delay-200">
+                    <Award className="text-yellow-500 mb-2" size={40} />
+                    <h3 className="text-lg font-semibold text-blue-900 mb-1">FlyZone Rewards</h3>
+                    <p className="text-sm text-blue-700 mb-2">
+                      Earn miles, unlock Gold status, and enjoy exclusive perks as you travel more with us.
+                    </p>
+                    <span className="inline-block bg-yellow-100 text-yellow-700 text-xs px-2 py-1 rounded-full">Gold Member Perks</span>
                   </div>
-                  <div className="bg-orange-50 p-4 rounded-lg">
-                    <div className="text-2xl font-bold text-orange-600">Gold</div>
-                    <div className="text-sm text-gray-600">Member Status</div>
+
+                  {/* 24/7 Support */}
+                  <div className="p-6 rounded-xl bg-white shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col items-center border border-blue-100 hover:border-blue-300 animate-in fade-in zoom-in-50 delay-300">
+                    <Headset className="text-green-500 mb-2" size={40} />
+                    <h3 className="text-lg font-semibold text-blue-900 mb-1">24/7 Support</h3>
+                    <p className="text-sm text-blue-700 mb-2">
+                      Our team is always here for you—before, during, and after your journey. Travel with peace of mind.
+                    </p>
+                    <span className="inline-block bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">Always Available</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
+
           </div>
         );
     }
@@ -153,14 +169,6 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
           >
             <MessageCircle size={16} className="mr-2" />
             Chat Agent
-          </Button>
-          <Button
-            onClick={() => setActiveTab('book')}
-            variant={activeTab === 'book' ? 'default' : 'ghost'}
-            className={`flex-1 ${activeTab === 'book' ? 'bg-sky-gradient text-white' : 'text-gray-600 hover:text-gray-800'}`}
-          >
-            <Plane size={16} className="mr-2" />
-            Book Flight
           </Button>
           <Button
             onClick={() => setActiveTab('flights')}

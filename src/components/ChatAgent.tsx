@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Send, Bot, User as UserIcon } from 'lucide-react';
 import { User } from '../types/user';
+import { api } from '@/lib/api';
+import { toast } from '@/hooks/use-toast';
 
 interface ChatAgentProps {
   user: User;
@@ -27,8 +29,9 @@ const ChatAgent: React.FC<ChatAgentProps> = ({ user }) => {
     }
   ]);
   const [newMessage, setNewMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
 
@@ -41,32 +44,49 @@ const ChatAgent: React.FC<ChatAgentProps> = ({ user }) => {
 
     setMessages(prev => [...prev, userMessage]);
     setNewMessage('');
+    setIsLoading(true);
 
-    // Simulate agent response
-    setTimeout(() => {
+    try {
+      // Get token from localStorage
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        throw new Error('Authentication token not found. Please log in again.');
+      }
+
+      // Send message to backend
+      const response = await api.askAgent(newMessage, token);
+      
       const agentResponse: Message = {
         id: (Date.now() + 1).toString(),
-        text: getAgentResponse(newMessage),
+        text: response.response,
         sender: 'agent',
         timestamp: new Date()
       };
+      
       setMessages(prev => [...prev, agentResponse]);
-    }, 1000);
-  };
-
-  const getAgentResponse = (userMessage: string): string => {
-    const lowerMessage = userMessage.toLowerCase();
-    
-    if (lowerMessage.includes('book') || lowerMessage.includes('flight')) {
-      return "I'd be happy to help you book a flight! You can use our flight booking feature to search for available flights. What destination are you interested in?";
-    } else if (lowerMessage.includes('cancel') || lowerMessage.includes('refund')) {
-      return "For cancellations and refunds, please check your booking details in the 'My Flights' section. Most tickets can be cancelled up to 24 hours before departure.";
-    } else if (lowerMessage.includes('baggage') || lowerMessage.includes('luggage')) {
-      return "For baggage information: Carry-on is included with all tickets. Checked baggage fees vary by destination. Would you like specific information for your upcoming flight?";
-    } else if (lowerMessage.includes('check-in') || lowerMessage.includes('checkin')) {
-      return "Online check-in opens 24 hours before your flight. You can check in through our website or mobile app. Don't forget to have your booking reference ready!";
-    } else {
-      return "Thank you for your message! I'm here to help with flights, bookings, check-ins, baggage, and any other travel-related questions. What would you like to know?";
+    } catch (error) {
+      console.error('Error sending message:', error);
+      
+      // Add error message from agent
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: error instanceof Error 
+          ? `Sorry, I encountered an error: ${error.message}` 
+          : "Sorry, I'm having trouble connecting to the server right now. Please try again later.",
+        sender: 'agent',
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+      
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to get response from agent",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -120,9 +140,18 @@ const ChatAgent: React.FC<ChatAgentProps> = ({ user }) => {
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder="Type your message..."
               className="flex-1"
+              disabled={isLoading}
             />
-            <Button type="submit" className="bg-sky-gradient hover:opacity-90">
-              <Send size={16} />
+            <Button 
+              type="submit" 
+              className="bg-sky-gradient hover:opacity-90"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <span className="animate-pulse">...</span>
+              ) : (
+                <Send size={16} />
+              )}
             </Button>
           </form>
         </div>

@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plane, CloudSun } from 'lucide-react';
 import { User } from '../types/user';
+import { api } from '@/lib/api';
+import { toast } from '@/hooks/use-toast';
 
 interface AuthPageProps {
   isRegistering: boolean;
@@ -20,28 +22,81 @@ const AuthPage: React.FC<AuthPageProps> = ({ isRegistering, setIsRegistering, on
     email: '',
     password: ''
   });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
-    if (isRegistering) {
-      // Simulate registration
-      const newUser: User = {
-        id: Date.now().toString(),
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email
-      };
-      onLogin(newUser);
-    } else {
-      // Simulate login
-      const user: User = {
-        id: '1',
-        firstName: 'John',
-        lastName: 'Doe',
-        email: formData.email
-      };
-      onLogin(user);
+    try {
+      if (isRegistering) {
+        // Register new user
+        const response = await api.register({
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          email: formData.email,
+          password: formData.password
+        });
+        
+        // After successful registration, automatically log in
+        const loginResponse = await api.login({
+          email: formData.email,
+          password: formData.password
+        });
+        
+        // Save token to localStorage
+        localStorage.setItem('token', loginResponse.access_token || '');
+        
+        // Create user object
+        const newUser: User = {
+          id: response.uuid || Date.now().toString(),
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email
+        };
+        
+        toast({
+          title: "Success",
+          description: "Account created successfully!"
+        });
+        
+        onLogin(newUser);
+      } else {
+        // Login existing user
+        const response = await api.login({
+          email: formData.email,
+          password: formData.password
+        });
+        
+        // Save token to localStorage
+        localStorage.setItem('token', response.access_token || '');
+        
+        // For now, we don't have user details in the login response
+        // So we'll create a user object with the email and placeholder values
+        // In a real app, you would make another API call to get user details
+        const user: User = {
+          id: '1', // This would come from the API in a real app
+          firstName: 'User', // This would come from the API in a real app
+          lastName: '', // This would come from the API in a real app
+          email: formData.email
+        };
+        
+        toast({
+          title: "Success",
+          description: "Logged in successfully!"
+        });
+        
+        onLogin(user);
+      }
+    } catch (error) {
+      console.error('Authentication error:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Authentication failed",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -113,6 +168,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ isRegistering, setIsRegistering, on
                           onChange={handleInputChange}
                           className="mt-1 border-gray-300 focus:border-flyzone-blue focus:ring-flyzone-blue"
                           placeholder="John"
+                          disabled={isLoading}
                         />
                       </div>
                       <div>
@@ -126,6 +182,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ isRegistering, setIsRegistering, on
                           onChange={handleInputChange}
                           className="mt-1 border-gray-300 focus:border-flyzone-blue focus:ring-flyzone-blue"
                           placeholder="Doe"
+                          disabled={isLoading}
                         />
                       </div>
                     </div>
@@ -143,6 +200,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ isRegistering, setIsRegistering, on
                     onChange={handleInputChange}
                     className="mt-1 border-gray-300 focus:border-flyzone-blue focus:ring-flyzone-blue"
                     placeholder="john@example.com"
+                    disabled={isLoading}
                   />
                 </div>
 
@@ -157,14 +215,16 @@ const AuthPage: React.FC<AuthPageProps> = ({ isRegistering, setIsRegistering, on
                     onChange={handleInputChange}
                     className="mt-1 border-gray-300 focus:border-flyzone-blue focus:ring-flyzone-blue"
                     placeholder="••••••••"
+                    disabled={isLoading}
                   />
                 </div>
 
                 <Button 
                   type="submit" 
                   className="w-full bg-sky-gradient hover:opacity-90 transition-all duration-300 text-white font-semibold py-3 shadow-lg hover:shadow-xl transform hover:scale-105"
+                  disabled={isLoading}
                 >
-                  {isRegistering ? 'Create Account' : 'Sign In'}
+                  {isLoading ? 'Processing...' : (isRegistering ? 'Create Account' : 'Sign In')}
                 </Button>
               </form>
 
@@ -172,8 +232,10 @@ const AuthPage: React.FC<AuthPageProps> = ({ isRegistering, setIsRegistering, on
                 <p className="text-gray-600">
                   {isRegistering ? 'Already have an account?' : "Don't have an account?"}
                   <button
+                    type="button"
                     onClick={() => setIsRegistering(!isRegistering)}
                     className="ml-2 text-flyzone-blue hover:text-flyzone-blue-light font-semibold transition-colors duration-200"
+                    disabled={isLoading}
                   >
                     {isRegistering ? 'Sign In' : 'Create Account'}
                   </button>
